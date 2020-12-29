@@ -22,9 +22,6 @@ def bfs(draw, start, end):
                 sys.exit()
 
         currNode = queue.pop(0)
-        # if currNode == end:
-        #     reconstruct_path(path, end, draw)
-        #     return True
         if not currNode.is_start() and not currNode.is_end():
             currNode.make_visited()
 
@@ -39,6 +36,7 @@ def bfs(draw, start, end):
                 queue.append(neighbour)
 
         draw()
+
 
 
 def draw(win, grid):
