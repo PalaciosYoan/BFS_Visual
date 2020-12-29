@@ -1,3 +1,4 @@
+"""Author: Yoan Palacios Guzman"""
 import pygame
 from node import Node
 

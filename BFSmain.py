@@ -1,3 +1,4 @@
+"""Author: Yoan Palacios Guzman"""
 import pygame, sys
 from grid import Grid
 
