@@ -1,5 +1,5 @@
 import pygame, sys
-from node import Node
+from grid import Grid
 
 
 def reconstruct_path(came_from, node, draw):
@@ -22,7 +22,9 @@ def bfs(draw, start, end):
                 sys.exit()
 
         currNode = queue.pop(0)
-
+        # if currNode == end:
+        #     reconstruct_path(path, end, draw)
+        #     return True
         if not currNode.is_start() and not currNode.is_end():
             currNode.make_visited()
 
@@ -32,7 +34,6 @@ def bfs(draw, start, end):
                     path[neighbour] = currNode
                     reconstruct_path(path, end, draw)
                     return True
-
                 neighbour.make_open()
                 path[neighbour] = currNode
                 queue.append(neighbour)
@@ -40,34 +41,10 @@ def bfs(draw, start, end):
         draw()
 
 
-def make_grid(rows, width):
-    grid = []
-    gap = width // rows
-    for i in range(rows):
-        grid.append([])
-        for j in range(rows):
-            spot = Node(i, j, gap, rows)
-            grid[i].append(spot)
-
-    return grid
-
-
-def draw_grid(win, rows, width):
-    gap = width // rows
-    for i in range(rows):
-        pygame.draw.line(win, (255, 165, 165), (0, i * gap), (width, i * gap))
-        for j in range(rows):
-            pygame.draw.line(win, (255, 165, 165), (j * gap, 0), (j * gap, width))
-
-
-def draw(win, grid, rows, width):
+def draw(win, grid):
     win.fill((255, 255, 255))
 
-    for row in grid:
-        for node in row:
-            node.draw(win)
-
-    draw_grid(win, rows, width)
+    grid.draw(win)
     pygame.display.update()
 
 
@@ -85,12 +62,12 @@ def main():
     pygame.display.set_caption("DFS Path Finding Algorithm")
 
     rows = 50
-    grid = make_grid(rows, width)
+    grid = Grid(rows, width)
 
     start, end = None, None
 
     while True:
-        draw(win, grid, rows, width)
+        draw(win, grid)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
@@ -98,7 +75,7 @@ def main():
             if pygame.mouse.get_pressed()[0]:  # LEFT
                 pos = pygame.mouse.get_pos()
                 row, col = get_clicked_pos(pos, rows, width)
-                node = grid[row][col]
+                node = grid.get_node(row, col)
                 if not start and node != end:
                     start = node
                     start.make_start()
@@ -113,7 +90,7 @@ def main():
             elif pygame.mouse.get_pressed()[2]:  # RIGHT
                 pos = pygame.mouse.get_pos()
                 row, col = get_clicked_pos(pos, rows, width)
-                node = grid[row][col]
+                node = grid.get_node(row, col)
                 node.reset()
                 if node == start:
                     start = None
@@ -122,16 +99,14 @@ def main():
 
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE and start and end:
-                    for row in grid:
-                        for node in row:
-                            node.update_neighbors(grid)
+                    grid.update_neighbors()
 
-                    bfs(lambda: draw(win, grid, rows, width), start, end)
+                    bfs(lambda: draw(win, grid), start, end)
 
                 if event.key == pygame.K_c:
                     start = None
                     end = None
-                    grid = make_grid(rows, width)
+                    grid.reset(rows, width)
 
 
 if __name__ == "__main__":
